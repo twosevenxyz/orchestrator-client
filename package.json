@@ -1,0 +1,43 @@
+{
+  "name": "@gurupras/orchestrator-client",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "debug:test": "node --inspect-brk ./node_modules/.bin/jest --coverage=false"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gurupras/node-orchestrator-client.git"
+  },
+  "author": "Guru Prasad Srinivasa",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gurupras/node-orchestrator-client/issues"
+  },
+  "homepage": "https://github.com/gurupras/node-orchestrator-client#readme",
+  "devDependencies": {
+    "@babel/core": "^7.11.6",
+    "@babel/preset-env": "^7.11.5",
+    "@types/jest": "^26.0.14",
+    "babel-jest": "^26.3.0",
+    "eslint": "^7.10.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jest": "^24.0.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "express": "^4.17.1",
+    "jest": "^26.4.2",
+    "jest-extended": "^0.11.5",
+    "portfinder": "^1.0.28",
+    "uuid": "^8.3.1"
+  },
+  "dependencies": {
+    "axios": "^0.20.0",
+    "emittery": "^0.7.1",
+    "md5": "^2.3.0"
+  }
+}
