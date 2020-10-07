@@ -1,7 +1,7 @@
 const debug = require('debug')('orchestrator-client:heartbeat')
 
 class HeartbeatTask {
-  constructor (axios, instanceId, { interval }) {
+  constructor (axios, instanceId, interval) {
     this.axios = axios
     this.instanceId = instanceId
     this.stopped = false
