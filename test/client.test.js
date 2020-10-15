@@ -1,8 +1,10 @@
+import dgram from 'dgram'
 import express from 'express'
 import portfinder from 'portfinder'
 import { v4 as uuidv4 } from 'uuid'
 import OrchestratorClient from '../index'
 import Emittery from 'emittery'
+import { testForEvent } from '@gurupras/test-helpers'
 
 describe('OrchestratorClient', () => {
   let secret
@@ -57,10 +59,83 @@ describe('OrchestratorClient', () => {
   })
 
   test('Starts heartbeat task if config contains heartbeatInterval', async () => {
-    config.heartbeatInterval = 100
+    config = {
+      modules: [
+        {
+          type: 'heartbeat',
+          config: {
+            heartbeatInterval: 100
+          }
+        }
+      ]
+    }
     const promise = bus.once('heartbeat')
     await expect(client.init('test')).toResolve()
     await expect(promise).toResolve()
     await expect(client.heartbeatTask.stop()).toResolve()
+  })
+
+  test('Calling metrics.log does not fail regardless of configuration', async () => {
+    expect(() => client.metrics.log('test', 'load', 0.5)).not.toThrow()
+  })
+
+  describe('Metrics', () => {
+    let statsdPort
+    let server
+    beforeEach(async () => {
+      statsdPort = await portfinder.getPortPromise()
+      server = dgram.createSocket('udp4')
+      server.bind(statsdPort, '127.0.0.1')
+    })
+    afterEach(async () => {
+      return new Promise(resolve => server.close(resolve))
+    })
+
+    function getStatsdConfig () {
+      return {
+        type: 'statsd',
+        config: {
+          client: {
+            host: '127.0.0.1',
+            port: statsdPort,
+            socketTimeout: 100
+          }
+        }
+      }
+    }
+
+    test('Logs statsd metrics correctly upon specifying config', async () => {
+      const promise = testForEvent(server, 'message')
+
+      config = {
+        modules: [getStatsdConfig()]
+      }
+      await expect(client.init('test')).toResolve()
+      await expect(client.metrics.log('gauge', 'load', 0.5)).toResolve()
+      await expect(promise).toResolve()
+    })
+
+    test('Adds prefix if specified', async () => {
+      const statsdConfig = getStatsdConfig()
+      statsdConfig.config.prefix = 'group.zone'
+      config = {
+        modules: [statsdConfig]
+      }
+
+      const msgs = []
+      server.on('message', msg => {
+        msgs.push(msg)
+      })
+      const promise = testForEvent(server, 'message')
+      await expect(client.init('test')).toResolve()
+      await expect(client.metrics.log('gauge', 'load', 0.5)).toResolve()
+      await expect(promise).toResolve()
+
+      expect(msgs).toBeArrayOfSize(1)
+
+      const [msg] = msgs
+      const str = msg.toString('utf-8')
+      expect(str).toContain('group.zone.')
+    })
   })
 })
