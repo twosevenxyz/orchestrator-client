@@ -22,9 +22,13 @@ class OrchestratorClient {
     return md5(fs.readFileSync('/var/lib/dbus/machine-id'))
   }
 
-  async _register () {
+  async _register (port, data) {
+    if (!port) {
+      throw new Error('Must specify port when registering instance')
+    }
+    data = data || {}
     const { axios, instanceId } = this
-    const response = await axios.post('/api/register-instance', { instanceId })
+    const response = await axios.post('/api/register-instance', { instanceId, port, ...data })
     return response.data
   }
 
@@ -36,9 +40,15 @@ class OrchestratorClient {
     return response.data
   }
 
-  async init (uniqueID) {
+  /**
+   * Initialize the orchestrator client
+   * @param {Number} port The port that the service listens on
+   * @param {Object} data Additional attributes to register service with
+   * @param {String} uniqueID a unique ID that will be suffixed to the machine ID. This is to be used in cases where the same machine has multiple services
+   */
+  async init (port, data, uniqueID = port) {
     this.instanceId = `${this._getDeviceID()}-${uniqueID}`
-    await this._register()
+    await this._register(port, data)
     const config = await this._getConfig()
 
     this.metrics = { log () {} }
