@@ -39,7 +39,9 @@
   "dependencies": {
     "axios": "^0.20.0",
     "emittery": "^0.7.1",
+    "find-process": "^1.4.4",
     "md5": "^2.3.0",
+    "minimist": "^1.2.5",
     "statsd-client": "^0.4.5"
   }
 }
