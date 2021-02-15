@@ -6,6 +6,10 @@ const StatsdClient = require('statsd-client')
 
 const HeartbeatTask = require('./heartbeat')
 
+const { Logger } = require('@gurupras/log')
+
+const log = new Logger('orchestrator-client')
+
 class OrchestratorClient {
   constructor (url, secret) {
     new Emittery().bindMethods(this)
@@ -48,8 +52,10 @@ class OrchestratorClient {
    */
   async init (port, data, uniqueID = port) {
     this.instanceId = `${this._getDeviceID()}-${uniqueID}`
-    await this._register(port, data)
+    const registrationResponse = await this._register(port, data)
+    log.debug('Registered instance', registrationResponse)
     const config = await this._getConfig()
+    log.debug('Received config', config)
 
     this.metrics = { log () {} }
 
@@ -77,6 +83,7 @@ class OrchestratorClient {
                 return this.statsd[fn](finalMetric, value, ...args)
               }
             }
+            log.debug('Initialized statsd', { client, prefix })
           }
         }
       }
