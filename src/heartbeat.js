@@ -1,4 +1,5 @@
 const debug = require('debug')('orchestrator-client:heartbeat')
+const Emittery = require('emittery')
 
 class HeartbeatTask {
   constructor (axios, instanceId, interval) {
@@ -6,6 +7,7 @@ class HeartbeatTask {
     this.instanceId = instanceId
     this.stopped = false
     this.interval = interval
+    new Emittery().bindMethods(this)
   }
 
   async heartbeat () {
@@ -28,7 +30,11 @@ class HeartbeatTask {
         return
       }
       try {
-        await this.heartbeat()
+        const response = await this.heartbeat()
+        const { data } = response
+        if (Object.keys(data).length > 0) {
+          await this.emit('tasks', data)
+        }
       } catch (e) {
         debug(`Error sending heartbeat: ${e.message}`)
       }

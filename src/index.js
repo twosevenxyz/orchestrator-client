@@ -14,6 +14,7 @@ class OrchestratorClient {
   constructor (url, secret) {
     new Emittery().bindMethods(this)
     this.url = url
+    /** @type{Axios.AxiosInstance} */
     this.axios = Axios.create({
       baseURL: url,
       headers: {
@@ -89,7 +90,33 @@ class OrchestratorClient {
       }
     }
 
+    this.heartbeatTask.on('tasks', async tasks => {
+      // Right now, only exit is defined
+      let exitTask
+      for (const task of tasks) {
+        const { type } = task
+        switch (type) {
+          case 'exit':
+            // We don't run this right away, since we want to make sure we complete other tasks
+            exitTask = task
+            break
+        }
+      }
+      if (exitTask) {
+        await this.emit('exit', exitTask)
+        await this.destroy()
+      }
+    })
     await this.emit('init', config)
+  }
+
+  async destroy () {
+    const { instanceId, axios } = this
+    try {
+      await axios.delete(`/api/destroy/${instanceId}`)
+    } catch (e) {
+      log.error('Failed to make API request to delete instance')
+    }
   }
 }
 
