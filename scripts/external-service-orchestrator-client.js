@@ -11,18 +11,20 @@ const port = argv['orchestrator-service-port'] || process.env.ORCHESTRATOR_SERVI
 ;(async () => {
   const client = new OrchestratorClient(url, secret)
   await client.init(port)
-  // At this point, the heartbeat task should've been set up. Hijack it
-  const { heartbeatTask } = client
-  let { heartbeat: origHeartbeatFn } = heartbeatTask
-  origHeartbeatFn = origHeartbeatFn.bind(heartbeatTask)
 
-  const minProcessCount = argv['external-service-name'] ? 2 : 1 // If the process name is specified in argv, then this node process always be reported by find-process. So we expect 2 instead
-  heartbeatTask.heartbeat = async () => {
-    const processes = await findProcess('name', externalServiceName)
-    if (processes.length < minProcessCount) { // The process itself will always be
+  if (externalServiceName) {
+    // At this point, the heartbeat task should've been set up. Hijack it
+    const { heartbeatTask } = client
+    let { heartbeat: origHeartbeatFn } = heartbeatTask
+    origHeartbeatFn = origHeartbeatFn.bind(heartbeatTask)
+    const minProcessCount = argv['external-service-name'] ? 2 : 1 // If the process name is specified in argv, then this node process always be reported by find-process. So we expect 2 instead
+    heartbeatTask.heartbeat = async () => {
+      const processes = await findProcess('name', externalServiceName)
+      if (processes.length < minProcessCount) { // The process itself will always be
       // Do not trigger heartbeat
-      return
+        return
+      }
+      origHeartbeatFn()
     }
-    origHeartbeatFn()
   }
 })()
