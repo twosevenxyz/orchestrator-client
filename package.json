@@ -33,8 +33,7 @@
     "express": "^4.17.1",
     "jest": "^26.4.2",
     "jest-extended": "^0.11.5",
-    "portfinder": "^1.0.28",
-    "uuid": "^8.3.2"
+    "portfinder": "^1.0.28"
   },
   "dependencies": {
     "@gurupras/log": "^0.3.0",
@@ -43,6 +42,7 @@
     "find-process": "^1.4.4",
     "md5": "^2.3.0",
     "minimist": "^1.2.5",
-    "statsd-client": "^0.4.5"
+    "statsd-client": "^0.4.5",
+    "uuid": "^8.3.2"
   }
 }
