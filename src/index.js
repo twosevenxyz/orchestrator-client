@@ -1,5 +1,6 @@
 const fs = require('fs')
 const md5 = require('md5')
+const { v4: uuidv4 } = require('uuid')
 const Axios = require('axios')
 const Emittery = require('emittery')
 const StatsdClient = require('statsd-client')
@@ -53,6 +54,13 @@ class OrchestratorClient {
    */
   async init (port, data, uniqueID = port) {
     this.instanceId = `${this._getDeviceID()}-${uniqueID}`
+    if (data) {
+      for (const [k, v] of Object.entries(data)) {
+        if (v === '<random-uuid>') {
+          data[k] = uuidv4()
+        }
+      }
+    }
     const registrationResponse = await this._register(port, data)
     log.debug('Registered instance', registrationResponse)
     const config = await this._getConfig()

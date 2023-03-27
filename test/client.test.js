@@ -46,6 +46,10 @@ describe('OrchestratorClient', () => {
     client = new OrchestratorClient(`http://localhost:${port}`, secret)
   })
 
+  beforeEach(async () => {
+    jest.restoreAllMocks()
+  })
+
   afterAll(async () => {
     return new Promise(resolve => server.close(resolve))
   })
@@ -55,7 +59,23 @@ describe('OrchestratorClient', () => {
   })
 
   test('init registers instance', async () => {
-    await expect(client.init('test')).toResolve()
+    const promise = client.init('test')
+    await promise
+    await expect(promise).toResolve()
+  })
+
+  test('init with data containing <random-uuid> replaces value with a uuid', async () => {
+    const data = {
+      uuid: '<random-uuid>'
+    }
+
+    jest.spyOn(client, '_register')
+    const promise = client.init('test', data)
+    await expect(promise).toResolve()
+    expect(client._register).toHaveBeenCalledWith('test', {
+      ...data,
+      uuid: expect.not.stringContaining('<random-uuid>')
+    })
   })
 
   test('Starts heartbeat task if config contains heartbeatInterval', async () => {
