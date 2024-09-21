@@ -8,6 +8,7 @@ const StatsdClient = require('statsd-client')
 const HeartbeatTask = require('./heartbeat')
 
 const { Logger } = require('@gurupras/log')
+const { getInitDataFromEnv } = require('./utils')
 
 const log = new Logger('orchestrator-client')
 
@@ -53,6 +54,10 @@ class OrchestratorClient {
    * @param {String} uniqueID a unique ID that will be suffixed to the machine ID. This is to be used in cases where the same machine has multiple services
    */
   async init (port, data, uniqueID = port) {
+    if (!data) {
+      // Check environment variable
+      data = getInitDataFromEnv()
+    }
     this.instanceId = `${this._getDeviceID()}-${uniqueID}`
     if (data) {
       for (const [k, v] of Object.entries(data)) {

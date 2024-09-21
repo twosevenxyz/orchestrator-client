@@ -1,11 +1,12 @@
 const OrchestratorClient = require('../index')
 const findProcess = require('find-process')
+const { getInitDataFromEnv } = require('../src/utils')
 const argv = require('minimist')(process.argv.slice(2))
 
 const url = argv['orchestrator-url'] || process.env.ORCHESTRATOR_URL
 const secret = argv['orchestrator-secret'] || process.env.ORCHESTRATOR_SECRET
 const externalServiceName = argv['external-service-name'] || process.env.ORCHESTRATOR_EXTERNAL_SERVICE_NAME
-const initData = JSON.parse(argv['init-data'] || process.env.ORCHESTRATOR_INIT_DATA || '{}')
+const initData = JSON.parse(argv['init-data'] || getInitDataFromEnv())
 
 const port = argv['orchestrator-service-port'] || process.env.ORCHESTRATOR_SERVICE_PORT
 
