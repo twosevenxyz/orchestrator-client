@@ -1,5 +1,5 @@
 function getInitDataFromEnv () {
-  const initData = JSON.parse(process.env.ORCHESTRATOR_INIT_DATA || '{}')
+  const initData = process.env.ORCHESTRATOR_INIT_DATA || '{}'
   return initData
 }
 

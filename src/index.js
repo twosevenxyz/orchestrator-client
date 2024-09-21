@@ -56,7 +56,7 @@ class OrchestratorClient {
   async init (port, data, uniqueID = port) {
     if (!data) {
       // Check environment variable
-      data = getInitDataFromEnv()
+      data = JSON.parse(getInitDataFromEnv())
     }
     this.instanceId = `${this._getDeviceID()}-${uniqueID}`
     if (data) {
