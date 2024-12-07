@@ -35,14 +35,14 @@ class OrchestratorClient {
     }
     data = data || {}
     const { axios, instanceId } = this
-    const response = await axios.post('/api/register-instance', { instanceId, port, ...data })
+    const response = await axios.post('/api/register-instance', { instanceID: instanceId, instanceId, port, ...data })
     return response.data
   }
 
   async _getConfig () {
     const { axios, instanceId } = this
     const response = await axios.get('/api/config', {
-      params: { instanceId }
+      params: { instanceID: instanceId, instanceId }
     })
     return response.data
   }
