@@ -59,6 +59,7 @@ class OrchestratorClient {
       data = JSON.parse(getInitDataFromEnv())
     }
     this.instanceId = `${this._getDeviceID()}-${uniqueID}`
+    log.info(`instanceID=${this.instanceId}`)
     if (data) {
       for (const [k, v] of Object.entries(data)) {
         if (v === '<random-uuid>') {

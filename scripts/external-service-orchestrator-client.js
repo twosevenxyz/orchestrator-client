@@ -2,6 +2,9 @@ const OrchestratorClient = require('../index')
 const findProcess = require('find-process')
 const { getInitDataFromEnv } = require('../src/utils')
 const argv = require('minimist')(process.argv.slice(2))
+const { globalLoggers, ConsoleLogger } = require('@gurupras/log')
+
+globalLoggers.push(ConsoleLogger())
 
 const url = argv['orchestrator-url'] || process.env.ORCHESTRATOR_URL
 const secret = argv['orchestrator-secret'] || process.env.ORCHESTRATOR_SECRET
